@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.swing.*;
@@ -43,7 +44,9 @@ class Notepad implements ActionListener{
 		open = new JMenuItem("Open");
 		open.addActionListener(this);
 		save = new JMenuItem("Save");
+		save.addActionListener(this);
 		saveas = new JMenuItem("Save As");
+		saveas.addActionListener(this);
 		file.add(New);
 		file.add(open);
 		file.add(save);
@@ -107,6 +110,13 @@ class Notepad implements ActionListener{
 					
 				}
 			}
+		} else if(ae.getSource()==saveas) {
+			try {
+				save();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 	}
@@ -124,7 +134,32 @@ class Notepad implements ActionListener{
 		
 	}
 	
-	public void save() {
+	public void save() throws IOException {
 		
+		JFileChooser chooser = new JFileChooser();
+		chooser.setCurrentDirectory(new File("/home/me/Documents"));
+		int option = chooser.showSaveDialog(null);
+		if (option == JFileChooser.APPROVE_OPTION) {
+			String hold;
+			if (filetypecheck(chooser.getSelectedFile().getAbsolutePath())){
+				hold = chooser.getSelectedFile().getAbsolutePath();
+
+			} else {
+				hold = chooser.getSelectedFile().getAbsolutePath() + ".txt";
+			}
+			FileWriter writer = new FileWriter(hold);
+			writer.write(text.getText());
+			writer.close();
+		} else {
+			
+		}
+	}
+	
+	public boolean filetypecheck(String x) {
+		if (x.substring(x.length()-4, x.length()).equals(".txt")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
