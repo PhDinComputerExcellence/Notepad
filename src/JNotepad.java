@@ -34,7 +34,7 @@ class Notepad implements ActionListener{
 		
 		frame.add(textscroll);
 		frame.setSize(500, 500);
-		frame.setDefaultCloseOperation(frame.DISPOSE_ON_CLOSE);
+		frame.setDefaultCloseOperation(frame.EXIT_ON_CLOSE);
 		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		
 		JMenuBar menubar = new JMenuBar();
@@ -135,23 +135,45 @@ class Notepad implements ActionListener{
 	}
 	
 	public void save() throws IOException {
-		
+		Boolean exists = true;
 		JFileChooser chooser = new JFileChooser();
 		chooser.setCurrentDirectory(new File("/home/me/Documents"));
-		int option = chooser.showSaveDialog(null);
-		if (option == JFileChooser.APPROVE_OPTION) {
-			String hold;
-			if (filetypecheck(chooser.getSelectedFile().getAbsolutePath())){
-				hold = chooser.getSelectedFile().getAbsolutePath();
-
-			} else {
-				hold = chooser.getSelectedFile().getAbsolutePath() + ".txt";
-			}
-			FileWriter writer = new FileWriter(hold);
-			writer.write(text.getText());
-			writer.close();
-		} else {
-			
+		while (exists) {
+			int option = chooser.showSaveDialog(null);
+			if (option == JFileChooser.APPROVE_OPTION) {
+				String hold;
+				File file = chooser.getSelectedFile();
+				if (file.exists()) {
+					int results = JOptionPane.showConfirmDialog(chooser, "Do you want to overwrite existing file?", "File Exists!",JOptionPane.YES_NO_CANCEL_OPTION);
+					switch(results){
+	                case JOptionPane.YES_OPTION:
+	                    exists = false;
+	                    break;
+	                case JOptionPane.NO_OPTION:
+	                    break;
+	                case JOptionPane.CLOSED_OPTION:
+	                    break;
+	                case JOptionPane.CANCEL_OPTION:
+	                    break;
+	                    
+	            }
+				}
+				if (!exists) {
+					if (filetypecheck(chooser.getSelectedFile().getAbsolutePath())){
+						hold = chooser.getSelectedFile().getAbsolutePath();
+					} else {
+						hold = chooser.getSelectedFile().getAbsolutePath() + ".txt";
+					}
+					
+					FileWriter writer = new FileWriter(hold);
+					writer.write(text.getText());
+					writer.close();
+				} else {
+					
+				}
+				} else {
+					exists = false;
+				}
 		}
 	}
 	
