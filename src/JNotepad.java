@@ -1,3 +1,12 @@
+// 
+//    Name:  Lee, Kevin
+//    Project: 3
+//    Due:       3/12/2018 
+//    Course: CS-245-01-w18 
+// 
+//    Description: 
+//     A Complete Notepad application replicated from java swing! 
+//
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
