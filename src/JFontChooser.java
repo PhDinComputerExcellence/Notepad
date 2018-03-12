@@ -16,7 +16,10 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.font.TextAttribute;
+import java.io.IOException;
 import java.text.AttributedString;
 
 import javax.swing.text.StyleConstants;
@@ -135,7 +138,6 @@ public class JFontChooser extends JDialog implements ActionListener {
 		label.setBorder(BorderFactory.createEmptyBorder(0,0,0,100));
 		topLeft.add(label);
 		text1.setMaximumSize(new Dimension(3000,10));;
-		topLeft.add(text1);
 		topLeft.add(thelist);
 		
 		top.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
@@ -143,7 +145,6 @@ public class JFontChooser extends JDialog implements ActionListener {
 		label2.setBorder(BorderFactory.createEmptyBorder(0,0,0,100));
 		top.add(label2);
 		text2.setMaximumSize(new Dimension(3000, 10));
-		top.add(text2);
 		top.add(thelist2);
 		
 		
@@ -151,7 +152,6 @@ public class JFontChooser extends JDialog implements ActionListener {
 		label3.setBorder(BorderFactory.createEmptyBorder(0,0,0,100));
 		topRight.add(label3);
 		text3.setMaximumSize(new Dimension(3000, 10));
-		topRight.add(text3);
 		topRight.add(thelist3);
 		
 		
@@ -215,12 +215,64 @@ public class JFontChooser extends JDialog implements ActionListener {
 				mainLabel.setText("aAbBcC");
 			}
 		}).start();
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				chosen = false;
+			}
+		});
 		
 		
 	}
 	
 	public void setDefault(Font x) {
+		System.out.println(x.getFontName());
 		font = x;
+		String styles = "";
+		switch (x.getStyle()) {
+		case(0):
+			styles = "Plain";
+			break;
+		case(1):
+			styles = "Bold";
+			break;
+		case(2):
+			styles = "Italics";
+			break;
+		case(3):
+			styles = "Italics+Bold";
+			break;
+		}
+		styleList.setSelectedIndex(indexFinder(styleList, styles));
+		size.setSelectedIndex(sizeindexFinder(size, Integer.toString(font.getSize())));
+		if (x.getName()=="Courier New") {
+			list.setSelectedIndex(30);
+		} else {
+		list.setSelectedIndex(indexFinder(list, font.getName()));
+		}
+		
+	}
+	
+	public int indexFinder(JList<String> x, String y) {
+		int hold = 0;
+		for (int i = 0; i < x.getModel().getSize(); i ++) {
+			x.setSelectedIndex(i);
+			if (x.getSelectedValue()==y) {
+				hold = i;
+				break;
+			}
+		}
+		return hold;
+	}
+	public int sizeindexFinder(JList<String> x, String y) {
+		int hold = 0;
+		for (int i = 0; i < x.getModel().getSize(); i ++) {
+			x.setSelectedIndex(i);
+			if (x.getSelectedValue().matches(y)) {
+				hold = i;
+				break;
+			}
+		}
+		return hold;
 	}
 	
 	public void setDefault(Color x) {
