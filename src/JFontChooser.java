@@ -1,12 +1,12 @@
-/** 
- *   Name:  Lee, Kevin
- *   Project: 2
- *   Due:      3/7/2018
- *   Course:   CS-245-01-w18  
- * 
- *   Description: 
- *    A Font chooser Dialog that can be used anytime to output a color and a font.
- */ 
+// 
+//    Name:  Lee, Kevin
+//    Project: 3
+//    Due:       3/12/2018 
+//    Course: CS-245-01-w18 
+// 
+//    Description: 
+//     A Complete Notepad application replicated from java swing! 
+//
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -225,27 +225,24 @@ public class JFontChooser extends JDialog implements ActionListener {
 	}
 	
 	public void setDefault(Font x) {
-		System.out.println(x.getFontName());
 		font = x;
-		String styles = "";
 		switch (x.getStyle()) {
 		case(0):
-			styles = "Plain";
+			styleList.setSelectedIndex(0);
 			break;
 		case(1):
-			styles = "Bold";
+			styleList.setSelectedIndex(1);
 			break;
 		case(2):
-			styles = "Italics";
+			styleList.setSelectedIndex(2);
 			break;
 		case(3):
-			styles = "Italics+Bold";
+			styleList.setSelectedIndex(3);
 			break;
 		}
-		styleList.setSelectedIndex(indexFinder(styleList, styles));
 		size.setSelectedIndex(sizeindexFinder(size, Integer.toString(font.getSize())));
 		if (x.getName()=="Courier New") {
-			list.setSelectedIndex(30);
+			list.setSelectedIndex(indexFinder(list, font.getName()));
 		} else {
 		list.setSelectedIndex(indexFinder(list, font.getName()));
 		}
@@ -256,7 +253,7 @@ public class JFontChooser extends JDialog implements ActionListener {
 		int hold = 0;
 		for (int i = 0; i < x.getModel().getSize(); i ++) {
 			x.setSelectedIndex(i);
-			if (x.getSelectedValue()==y) {
+			if (x.getSelectedValue().matches(y)) {
 				hold = i;
 				break;
 			}

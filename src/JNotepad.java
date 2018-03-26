@@ -35,7 +35,9 @@ import java.util.Date;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Utilities;
@@ -72,6 +74,8 @@ class Notepad implements ActionListener{
 		
 		frame= new JFrame();
 		frame.setTitle("Untitled - Notepad");
+		ImageIcon img = new ImageIcon("JNotepad.png");
+		frame.setIconImage(img.getImage());
 		text = new JTextArea();
 		cur = 0;
 		text.getDocument().addDocumentListener(new DocumentListener() {
@@ -91,6 +95,17 @@ class Notepad implements ActionListener{
 	        	curstring = "";
 	        }
 		});
+		JPopupMenu popup = new JPopupMenu();
+		Action cut = new DefaultEditorKit.CutAction();
+		cut.putValue(Action.NAME, "Cut");
+		Action copy = new DefaultEditorKit.CopyAction();
+		copy.putValue(Action.NAME, "Copy");
+		Action paste = new DefaultEditorKit.PasteAction();
+		paste.putValue(Action.NAME, "Paste");
+		popup.add(cut);
+		popup.add(copy);
+		popup.add(paste);
+		text.setComponentPopupMenu(popup);
 		Highlighter h = text.getHighlighter();
 		JScrollPane textscroll = new JScrollPane(text);
 		PrinterJob pj = PrinterJob.getPrinterJob();
@@ -155,6 +170,7 @@ class Notepad implements ActionListener{
 				JDialog dialog = new JDialog(frame, "Find");
 			    dialog.setBounds(200, 200, 450, 125);
 			    dialog.setResizable(false);
+			    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			    JPanel main = new JPanel();
 			    main.setLayout(new BoxLayout(main, BoxLayout.PAGE_AXIS));
 			    JPanel panel1 = new JPanel();
@@ -309,6 +325,7 @@ class Notepad implements ActionListener{
 		        String x = date.format(currenttime);
 		        String y = time.format(currenttime);
 		        text.insert(y + " " + x, text.getCaretPosition());
+		        
 			}
 		});
 		WordWrap = new JCheckBox("Word Wrap");
@@ -339,6 +356,18 @@ class Notepad implements ActionListener{
 			}
 			
 		});
+		JMenuItem background = new JMenuItem("Background Color");
+		background.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent a) {
+				JColorChooser stuff = new JColorChooser();
+				Color holder = JColorChooser.showDialog(frame,
+			               "Font Colors", text.getBackground());
+				if(holder != null){
+                    frame.getContentPane().setBackground(holder);
+                }
+				text.setBackground(holder);
+			}
+		});
 		StatusBar = new JCheckBox("Status Bar");
 		ViewHelp = new JMenuItem("View Help");
 		ViewHelp.addActionListener(this);
@@ -348,7 +377,7 @@ class Notepad implements ActionListener{
 				JOptionPane.showMessageDialog(frame, "(C) Kevin Lee", "About JNotePad",JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
-
+ 
 
 
 
@@ -427,6 +456,8 @@ class Notepad implements ActionListener{
 		WordWrap.setMnemonic('W');
 		format.add(Font1);
 		Font1.setMnemonic('F');
+		format.addSeparator();
+		format.add(background);
 
 		JMenu view = new JMenu("View");
 		view.add(StatusBar);
@@ -586,11 +617,83 @@ class Notepad implements ActionListener{
 			}
 		} else if (ae.getSource()==exit) {
 			frame.dispose();
+			System.exit(1);
 		} else if(ae.getSource()==open) {
 			if (modified) {
-				
+				int opt =JOptionPane.showConfirmDialog(frame, "Do you want to saved your current file?", "Warning!",JOptionPane.YES_NO_CANCEL_OPTION);
+				switch (opt) {
+				case JOptionPane.OK_OPTION:
+					if (dir!="") {
+						try {
+							save(true);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					} else {
+						try {
+							save(false);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					JFileChooser filechoose = new JFileChooser();
+					FileNameExtensionFilter filter2 = new FileNameExtensionFilter(".java files", "java", "java");
+					FileNameExtensionFilter filter = new FileNameExtensionFilter(".txt files", "txt", "text");
+					filechoose.setFileFilter(filter);
+					filechoose.setFileFilter(filter2);
+					int value = filechoose.showOpenDialog(null);
+					if (value == JFileChooser.APPROVE_OPTION) {
+						File file = filechoose.getSelectedFile();
+						dir = filechoose.getSelectedFile().getAbsolutePath();
+						try {
+							fileRead(file);
+							frame.setTitle(filechoose.getSelectedFile().getName() + " - Notepad");
+							modified = false;
+						} catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+					}
+					break;
+				case JOptionPane.CANCEL_OPTION:
+					break;
+				case JOptionPane.NO_OPTION:
+					JFileChooser filechoose1 = new JFileChooser();
+					FileNameExtensionFilter filter3 = new FileNameExtensionFilter(".java files", "java", "java");
+					FileNameExtensionFilter filter4 = new FileNameExtensionFilter(".txt files", "txt", "text");
+					filechoose1.setFileFilter(filter3);
+					filechoose1.setFileFilter(filter4);
+					int value1 = filechoose1.showOpenDialog(null);
+					if (value1 == JFileChooser.APPROVE_OPTION) {
+						File file = filechoose1.getSelectedFile();
+						dir = filechoose1.getSelectedFile().getAbsolutePath();
+						try {
+							fileRead(file);
+							frame.setTitle(filechoose1.getSelectedFile().getName() + " - Notepad");
+							modified = false;
+						} catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+					}
+					
+				}
 			} else {
 				JFileChooser filechoose = new JFileChooser();
+				FileNameExtensionFilter filter2 = new FileNameExtensionFilter(".java files", "java", "java");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(".txt files", "txt", "text");
+				filechoose.setFileFilter(filter);
+				filechoose.setFileFilter(filter2);
 				int value = filechoose.showOpenDialog(null);
 				if (value == JFileChooser.APPROVE_OPTION) {
 					File file = filechoose.getSelectedFile();
